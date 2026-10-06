@@ -23,8 +23,8 @@ const svg =
   (cls: string): string =>
     `<svg viewBox="0 0 24 24" class="${cls}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
 
-export const CLOCK = svg(
-  '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+export const DIE = svg(
+  '<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><g fill="currentColor" stroke="none"><circle cx="8.5" cy="8.5" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="15.5" cy="15.5" r="1.3"/></g>',
 );
 
 const ICONS: Record<UnitId, (cls: string) => string> = {

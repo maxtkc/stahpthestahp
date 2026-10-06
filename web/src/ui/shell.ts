@@ -14,7 +14,7 @@ import {
   type Settings,
 } from '../model';
 import { getState, setState } from '../store';
-import { CLOCK, WAGE, type Unit } from '../units';
+import { DIE, WAGE, type Unit } from '../units';
 
 export interface Shell {
   lede: HTMLElement;
@@ -201,7 +201,7 @@ export function mountShell(root: HTMLElement): Shell {
   const price = (x: number): string =>
     `$${Number.isInteger(x) ? x : x.toFixed(2)}`;
   const syncUnit = (u: Unit | null): void => {
-    const icon = (u ? u.icon : CLOCK)('h-[18px] w-[18px]');
+    const icon = (u ? u.icon : DIE)('h-[18px] w-[18px]');
     unitBtn.innerHTML = `<span class="unit-pop flex">${icon}</span>${u ? `<span class="hidden max-w-48 truncate sm:inline">${u.name}</span>` : ''}`;
     const help = u
       ? COPY.unitHelp(u.name, price(u.price), WAGE)
