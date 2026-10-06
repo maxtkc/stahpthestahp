@@ -1,3 +1,9 @@
+## v0.3.0 (2026-10-06)
+
+### Feat
+
+- **web**: unit name caption on mobile, five-pip die icon
+
 ## v0.2.0 (2026-10-06)
 
 ### Feat
