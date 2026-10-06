@@ -21,7 +21,7 @@ cd web && pnpm dev            # site at localhost:5173
 |---|---|
 | `cli.py` | The `stahp` command |
 | `fetch.py` | `stahp fetch`: GTFS, LAMP OTP and ridership into `data/raw/` with `manifest.json` |
-| `stops.py` | `stahp stops`: platforms per typical pattern in route order, distance along the shape, terminal/trunk/junction/transfer/hub/accessible flags |
+| `stops.py` | `stahp stops`: platforms per typical pattern in route order, distance along the shape, terminal/junction/accessible flags |
 | `ridership.py` | `stahp riders`: weekday ons, offs, through and displaced riders per station, route, direction and hour; `by_station` sums routes |
 | `stopcost.py` | `stahp cost`: median LAMP dwell plus kinematic accel/decel loss per platform, direction and hour band |
 | `walk.py` | `stahp walk`: extra walk per displaced rider from the spacing to the neighbouring stops on a 1-D corridor |

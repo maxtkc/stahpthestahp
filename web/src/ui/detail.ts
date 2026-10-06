@@ -21,17 +21,14 @@ export function renderDetail(
   onClose: () => void,
 ): void {
   const r = ctx.scored.find((x) => x.station.key === s.key);
-  const flags = [
-    s.flags.includes('hub') ? COPY.flags.hub : '',
-    s.flags.includes('accessible')
-      ? COPY.flags.accessible
-      : COPY.flags.notAccessible,
-  ].filter(Boolean);
+  const access = s.flags.includes('accessible')
+    ? COPY.flags.accessible
+    : COPY.flags.notAccessible;
   el.innerHTML = `<div class="my-2 rounded-lg border border-line bg-surface p-4 sm:p-5">
     <div class="flex items-start justify-between gap-3">
       <div>
         <h2 class="text-lg font-semibold tracking-tight">${escapeHtml(s.name)}${bullets(s.routes)}</h2>
-        <p class="mt-0.5 text-xs text-muted">Rank ${r?.rank ?? '-'} of ${ctx.scored.length}, ${fmtHours(r?.net ?? 0)} hours per weekday. ${flags.join(', ')}.</p>
+        <p class="mt-0.5 text-xs text-muted">Rank ${r?.rank ?? '-'} of ${ctx.scored.length}, ${fmtHours(r?.net ?? 0)} hours per weekday. ${access}.</p>
       </div>
       <button data-close class="h-8 shrink-0 rounded-lg border border-line px-3 text-xs hover:border-secondary">${COPY.detail.close}</button>
     </div>

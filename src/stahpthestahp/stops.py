@@ -13,7 +13,6 @@ from stahpthestahp.fetch import GTFS_DATE, gtfs_feed_url
 log = logging.getLogger(__name__)
 
 # Light rail, heavy rail and commuter rail
-RAIL_ROUTE_TYPES = ("0", "1", "2")
 # Projected stops farther than this from the shape are logged
 MAX_OFFSET_M = 100.0
 EARTH_RADIUS_M = 6_371_000.0
@@ -93,7 +92,7 @@ def build_stops(gtfs: Path, route_ids: tuple[str, ...]) -> pl.DataFrame:
             pl.col("route_pattern_typicality") == "1",
         )
         trips = _read(z, "trips.txt", "trip_id", "route_id", "shape_id")
-        routes = _read(z, "routes.txt", "route_id", "route_type", "line_id")
+        routes = _read(z, "routes.txt", "route_id", "line_id")
         directions = _read(z, "directions.txt", "route_id", "direction_id", "direction")
         stops = _read(
             z,
@@ -182,13 +181,6 @@ def build_stops(gtfs: Path, route_ids: tuple[str, ...]) -> pl.DataFrame:
         (pl.col("seq") == 0) | (pl.col("seq") == pl.col("seq").max().over("pattern_id"))
     )["parent_station"]
 
-    # Stations served by more than one typical pattern of a line in a direction
-    trunk = (
-        table.group_by("line_id", "parent_station", "direction_id")
-        .agg(pl.col("pattern_id").n_unique().alias("n"))
-        .filter(pl.col("n") > 1)["parent_station"]
-    )
-
     # Stations where typical patterns of a line in one direction diverge or merge
     nbrs = table.sort("pattern_id", "seq").with_columns(
         pl.col("parent_station").shift(-1).over("pattern_id").alias("next"),
@@ -203,26 +195,10 @@ def build_stops(gtfs: Path, route_ids: tuple[str, ...]) -> pl.DataFrame:
         .filter((pl.col("n_next") > 1) | (pl.col("n_prev") > 1))["parent_station"]
     )
 
-    # Stations served by rail routes of more than one line
-    rail = (
-        trips.join(routes, on="route_id")
-        .filter(pl.col("route_type").is_in(RAIL_ROUTE_TYPES))
-        .select("trip_id", "line_id")
-    )
-    transfer = (
-        stop_times.join(rail, on="trip_id")
-        .join(platforms, on="stop_id")
-        .group_by("parent_station")
-        .agg(pl.col("line_id").n_unique().alias("n"))
-        .filter(pl.col("n") > 1)["parent_station"]
-    )
-
     table = table.with_columns(
         pl.col("parent_station").is_in(ends.implode()).alias("terminal"),
-        pl.col("parent_station").is_in(trunk.implode()).alias("trunk"),
-        pl.col("parent_station").is_in(transfer.implode()).alias("transfer"),
         pl.col("parent_station").is_in(junction.implode()).alias("junction"),
-    ).with_columns((pl.col("transfer") | pl.col("junction")).alias("hub"))
+    )
 
     log.info(
         "stops: %d platforms, %d stations on %s",
@@ -243,9 +219,6 @@ def build_stops(gtfs: Path, route_ids: tuple[str, ...]) -> pl.DataFrame:
         "lon",
         "dist_m",
         "terminal",
-        "trunk",
         "junction",
-        "transfer",
-        "hub",
         "accessible",
     ).sort("route_id", "direction_id", "pattern_id", "seq")

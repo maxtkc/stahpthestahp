@@ -24,15 +24,14 @@ def platform_hours(
     unweighted. dwell_h and accel_h split saved_h into its two parts, and
     walk_mh is displaced x extra walk metres / 3600, for rescaling by walk
     speed. Platforms at terminal stations are left out. A platform-hour
-    without a stop cost saves nothing and is flagged cost_gap. A platform on
+    without a stop cost saves nothing. A platform on
     several patterns of one route (Red trunk) takes the plain mean of their
     stop costs and walks, as ridership isn't split by branch.
     """
     keys = list(KEYS)
     terminal = stops.filter("terminal")["parent_station"].unique()
     costs = costs.group_by(*keys, "band").agg(
-        pl.col("stop_cost_s", "dwell_s", "accel_loss_s").mean(),
-        pl.col("fallback").any(),
+        pl.col("stop_cost_s", "dwell_s", "accel_loss_s").mean()
     )
     walk = walk.group_by(keys).agg(pl.col("extra_walk_m", "extra_walk_s").mean())
     out = (
@@ -41,7 +40,6 @@ def platform_hours(
         .join(walk, on=keys)
         .filter(~pl.col("parent_station").is_in(terminal.implode()))
         .with_columns(
-            pl.col("stop_cost_s").is_null().alias("cost_gap"),
             (pl.col("through") * pl.col("stop_cost_s").fill_null(0.0) / 3600).alias(
                 "saved_h"
             ),
@@ -50,7 +48,7 @@ def platform_hours(
         )
         .with_columns(
             (
-                pl.when(pl.col("cost_gap")).then(0.0).otherwise(pl.col(c))
+                pl.when(pl.col("stop_cost_s").is_null()).then(0.0).otherwise(pl.col(c))
                 * pl.col("through")
                 / 3600
             ).alias(name)
@@ -77,7 +75,7 @@ def rank(hours: pl.DataFrame, stops: pl.DataFrame, walk_weight: float) -> pl.Dat
     """
     flags = stops.group_by("parent_station").agg(
         pl.col("stop_name").first(),
-        pl.col("hub", "transfer", "junction", "trunk", "accessible").any(),
+        pl.col("accessible").any(),
     )
     out = (
         hours.group_by("parent_station")
@@ -88,10 +86,6 @@ def rank(hours: pl.DataFrame, stops: pl.DataFrame, walk_weight: float) -> pl.Dat
             .sum()
             .alias("_cost"),
             (pl.col("displaced") * pl.col("extra_walk_m")).sum().alias("_walk"),
-            pl.col("cost_gap").any(),
-            (pl.col("fallback").fill_null(False) & (pl.col("through") > 0))
-            .any()
-            .alias("cost_fallback"),
         )
         .join(flags, on="parent_station", how="left")
         .with_columns(
@@ -103,12 +97,6 @@ def rank(hours: pl.DataFrame, stops: pl.DataFrame, walk_weight: float) -> pl.Dat
         .sort("net_h", descending=True)
         .with_row_index("rank", offset=1)
     )
-    for r in out.filter("cost_gap").iter_rows(named=True):
-        log.warning(
-            "%s (%s): no stop cost for some platform-hours, counted as zero saving",
-            r["stop_name"],
-            r["parent_station"],
-        )
     return out.select(
         "rank",
         "parent_station",
@@ -121,13 +109,7 @@ def rank(hours: pl.DataFrame, stops: pl.DataFrame, walk_weight: float) -> pl.Dat
         "extra_walk_m",
         "walk_h",
         "net_h",
-        "hub",
-        "transfer",
-        "junction",
-        "trunk",
         "accessible",
-        "cost_gap",
-        "cost_fallback",
     )
 
 

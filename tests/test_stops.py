@@ -114,10 +114,7 @@ def test_build_stops(gtfs):
         for r in table.unique("parent_station").iter_rows(named=True)
     }
     assert {s for s in flags if flags[s]["terminal"]} == {"P1", "P3", "P4"}
-    assert {s for s in flags if flags[s]["trunk"]} == {"P1", "P2"}
     assert {s for s in flags if flags[s]["junction"]} == {"P2"}
-    assert {s for s in flags if flags[s]["transfer"]} == {"P1", "P3"}
-    assert {s for s in flags if flags[s]["hub"]} == {"P1", "P2", "P3"}
     # p1 inherits from its parent, p4 is blank and inherits too
     assert {s for s in flags if flags[s]["accessible"]} == {"P1", "P2", "P4"}
 
@@ -142,8 +139,5 @@ def test_build_stops_branches_of_one_route(gtfs):
         r["parent_station"]: r
         for r in table.unique("parent_station").iter_rows(named=True)
     }
-    # R shares P1 and P3 with C but is another line, so P3 isn't trunk and
-    # P1 isn't a junction
-    assert {s for s in flags if flags[s]["trunk"]} == {"P1", "P2"}
+    # R shares P1 with C but is another line, so P1 isn't a junction
     assert {s for s in flags if flags[s]["junction"]} == {"P2"}
-    assert {s for s in flags if flags[s]["transfer"]} == {"P1", "P3"}

@@ -10,10 +10,6 @@ STOPS = pl.DataFrame(
         "direction_id": ["0", "1"] * 3,
         "direction_name": ["West", "East"] * 3,
         "stop_name": ["Ess"] * 2 + ["Tee"] * 2 + ["You"] * 2,
-        "hub": [False] * 6,
-        "transfer": [False] * 6,
-        "junction": [False] * 6,
-        "trunk": [False] * 6,
         "accessible": [True] * 6,
     }
 )

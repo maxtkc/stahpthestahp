@@ -18,10 +18,6 @@ STOPS = pl.DataFrame(
         "lon": [-71.0, -71.1, -71.2],
         "dist_m": [0.0, 400.0, 1000.0],
         "terminal": [True, False, True],
-        "hub": [False] * 3,
-        "transfer": [False] * 3,
-        "junction": [False] * 3,
-        "trunk": [False] * 3,
         "accessible": [True, False, True],
     },
     schema_overrides={"seq": pl.Int32},
@@ -87,7 +83,6 @@ def test_patterns():
     (p,) = patterns(STOPS)
     assert p["stations"] == ["P1", "P2", "P3"]
     assert p["dist_m"] == [0.0, 400.0, 1000.0]
-    assert p["terminal"] == [True, False, True]
 
 
 def test_dwell_histogram():

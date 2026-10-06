@@ -50,17 +50,7 @@ function tickMarks(scale: NetScale, label: boolean): string {
 }
 
 function flagText(s: Station): string {
-  const out: string[] = [];
-  if (s.flags.includes('hub')) {
-    out.push(`<span title="${COPY.flags.hub}">hub</span>`);
-  }
-  if (s.flags.includes('cost_gap')) {
-    out.push(`<span title="${COPY.flags.cost_gap}">gap</span>`);
-  }
-  const icon = s.flags.includes('accessible') ? ` ${ACCESSIBLE}` : '';
-  return out.length
-    ? `${icon} <span class="text-[10px] uppercase tracking-wide text-muted">${out.join(', ')}</span>`
-    : icon;
+  return s.flags.includes('accessible') ? ` ${ACCESSIBLE}` : '';
 }
 
 export interface ListView {

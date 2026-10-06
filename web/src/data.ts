@@ -45,7 +45,6 @@ export interface Pattern {
   dir_name: string;
   stations: string[];
   dist_m: number[];
-  terminal: boolean[];
 }
 
 export interface ModeData {

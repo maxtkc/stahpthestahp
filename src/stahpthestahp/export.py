@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 # Dwell histogram bins, seconds
 DWELL_BIN_S = 5
 DWELL_MAX_S = 180
-FLAGS = ("hub", "transfer", "junction", "trunk", "accessible", "cost_gap")
+FLAGS = ("accessible",)
 
 
 def _r(x: float | None, nd: int = 1) -> float | None:
@@ -150,7 +150,6 @@ def patterns(stops: pl.DataFrame) -> list[dict]:
                 "dir_name": g["direction_name"][0],
                 "stations": g["parent_station"].to_list(),
                 "dist_m": g["dist_m"].round(0).to_list(),
-                "terminal": [bool(t) for t in g["terminal"]],
             }
         )
     return out

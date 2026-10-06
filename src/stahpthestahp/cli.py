@@ -246,8 +246,6 @@ def main(argv: list[str] | None = None) -> None:
                     pl.col("through", "displaced").round(0),
                     pl.col("stop_cost_s", "extra_walk_m").round(0),
                     pl.col("saved_h", "walk_h", "net_h").round(1),
-                    "hub",
-                    "cost_gap",
                 )
             )
             print(
@@ -300,7 +298,6 @@ def main(argv: list[str] | None = None) -> None:
                 table.filter(verdict="partial").select(
                     "stop_name",
                     "routes",
-                    "hub",
                     "policy",
                     "skipped",
                     pl.col(

@@ -64,10 +64,8 @@ export const COPY = {
   ] as const,
 
   flags: {
-    hub: 'Transfer or junction',
     accessible: 'Accessible',
     notAccessible: 'Not accessible',
-    cost_gap: 'Missing stop cost for some hours',
     stopCost: 'Stop cost per passing rider',
   },
 

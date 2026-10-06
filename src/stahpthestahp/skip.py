@@ -25,7 +25,7 @@ MIN_GAIN_FRAC = 0.1
 COST_SCALES = (0.5, 1.0)
 # Partial policies, simplest first
 POLICIES = ("by_direction", "by_band", "by_dir_band", "alternate", "mixed")
-FLAGS = ("hub", "transfer", "junction", "trunk", "accessible")
+FLAGS = ("accessible",)
 
 
 def headways(lamp_dir: Path, route_ids: tuple[str, ...]) -> pl.DataFrame:

@@ -12,10 +12,6 @@ STOPS = pl.DataFrame(
         "parent_station": ["P1", "P2", "P3", "P4"],
         "stop_name": ["One", "Two", "Three", "Four"],
         "terminal": [True, False, False, True],
-        "hub": [False, False, True, False],
-        "transfer": [False, False, True, False],
-        "junction": [False] * 4,
-        "trunk": [False] * 4,
         "accessible": [True] * 4,
     },
     schema_overrides={"seq": pl.Int32},
@@ -70,7 +66,6 @@ def test_platform_hours():
     assert out["parent_station"].to_list() == ["P2", "P2", "P3"]
     assert out["saved_h"].to_list() == pytest.approx([1.0, 1.0, 0.0])
     assert out["walk_h"].to_list() == pytest.approx([1.0, 0.5, 3.0])
-    assert out["cost_gap"].to_list() == [False, False, True]
     assert out["dwell_h"].to_list() == pytest.approx([30 / 36, 30 / 36, 0.0])
     assert out["accel_h"].to_list() == pytest.approx([6 / 36, 6 / 36, 0.0])
     assert out["walk_mh"].to_list() == pytest.approx([1.0, 0.5, 3.0])
@@ -86,10 +81,6 @@ def test_rank():
     # Through-weighted: (100 x 36 + 50 x 72) / 150
     assert p2["stop_cost_s"] == pytest.approx(48.0)
     assert p2["extra_walk_m"] == pytest.approx(180.0)
-    assert p2["cost_fallback"]
-    assert not p2["cost_gap"]
-    assert p3["cost_gap"]
-    assert p3["hub"]
     assert p3["net_h"] == pytest.approx(-6.0)
 
 
