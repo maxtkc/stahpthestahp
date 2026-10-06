@@ -10,8 +10,10 @@ import { renderDetail } from './ui/detail';
 import { renderLearn } from './ui/learn';
 import { createList } from './ui/list';
 import { mountShell } from './ui/shell';
+import { initTheme } from './theme';
 
 const shell = mountShell(document.getElementById('app') as HTMLElement);
+initTheme();
 const toggle = (key: string): void =>
   setState({ open: getState().open === key ? null : key });
 const list = createList(shell.axis, shell.list, toggle);

@@ -31,6 +31,11 @@ export interface Shell {
 const GEAR =
   '<svg viewBox="0 0 24 24" class="h-[18px] w-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>';
 
+const SUN =
+  '<svg viewBox="0 0 24 24" class="swap-on h-[18px] w-[18px] fill-current" aria-hidden="true"><path d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"/></svg>';
+const MOON =
+  '<svg viewBox="0 0 24 24" class="swap-off h-[18px] w-[18px] fill-current" aria-hidden="true"><path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z"/></svg>';
+
 const BTN =
   'h-10 shrink-0 rounded-lg border border-line bg-surface hover:border-secondary';
 const PILL = 'h-8 rounded-full border px-3 text-xs';
@@ -73,7 +78,14 @@ export function mountShell(root: HTMLElement): Shell {
   root.innerHTML = `
   <main class="mx-auto max-w-4xl px-4 pb-24 pt-10 sm:px-6 sm:pt-16">
     <header class="max-w-2xl">
-      <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">${COPY.title}</h1>
+      <div class="flex items-start justify-between gap-4">
+        <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">${COPY.title}</h1>
+        <label class="theme-toggle swap ${BTN} flex w-10 cursor-pointer items-center justify-center" title="${COPY.theme}">
+          <input type="checkbox" class="theme-controller" value="light" />
+          <span class="sr-only">${COPY.theme}</span>
+          ${SUN}${MOON}
+        </label>
+      </div>
       <p id="lede" class="mt-4 text-[15px] leading-7 text-secondary">${COPY.lede}</p>
       <div class="mt-5 flex flex-wrap items-center gap-2">
         <button id="learn-btn" class="${BTN} px-4 text-sm"></button>

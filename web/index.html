@@ -9,6 +9,14 @@
       content="MBTA stops ranked by the net weekday rider-hours of removing each one: time saved by riders passing through, minus extra walking for riders who used it."
     />
     <meta name="color-scheme" content="light dark" />
+    <script>
+      // Apply a saved theme before first paint
+      try {
+        const t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark')
+          document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <meta property="og:title" content="Stahp the stahp" />
     <meta

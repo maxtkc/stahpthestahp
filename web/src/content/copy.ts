@@ -48,6 +48,7 @@ export const COPY = {
   sortBest: 'Most time saved first',
   sortWorst: 'Most time lost first',
   settings: 'Settings',
+  theme: 'Toggle light and dark',
   axisLabel: 'saved / day',
   hrs: 'hrs',
 
