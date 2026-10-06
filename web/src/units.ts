@@ -24,7 +24,7 @@ const svg =
     `<svg viewBox="0 0 24 24" class="${cls}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
 
 export const DIE = svg(
-  '<path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7Z"/><path d="M3.5 7 12 11.5 20.5 7M12 11.5v10"/><g fill="currentColor" stroke="none"><ellipse cx="12" cy="7" rx="1.6" ry="0.9"/><circle cx="6.1" cy="11.4" r="1.1"/><circle cx="9.4" cy="17.1" r="1.1"/><circle cx="14.1" cy="12.9" r="1.1"/><circle cx="16.25" cy="14.25" r="1.1"/><circle cx="18.4" cy="15.6" r="1.1"/></g>',
+  '<rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><g fill="currentColor" stroke="none"><circle cx="8.3" cy="8.3" r="1.4"/><circle cx="15.7" cy="8.3" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="8.3" cy="15.7" r="1.4"/><circle cx="15.7" cy="15.7" r="1.4"/></g>',
 );
 
 const ICONS: Record<UnitId, (cls: string) => string> = {

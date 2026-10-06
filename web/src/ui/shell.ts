@@ -109,6 +109,7 @@ export function mountShell(root: HTMLElement): Shell {
         <button id="settings-btn" aria-label="${COPY.settings}" title="${COPY.settings}" aria-expanded="false"
           class="${BTN} flex w-10 items-center justify-center">${GEAR}</button>
       </div>
+      <p id="unit-name" hidden class="mt-1.5 truncate text-xs text-muted sm:hidden"></p>
       <section id="settings" hidden class="mt-3 rounded-lg border border-line bg-surface p-4">
         <fieldset>
           <legend class="mb-1.5 text-xs text-secondary">${COPY.settingsCost}</legend>
@@ -198,6 +199,7 @@ export function mountShell(root: HTMLElement): Shell {
   };
 
   const unitBtn = $<HTMLButtonElement>('unit');
+  const unitName = $('unit-name');
   const price = (x: number): string =>
     `$${Number.isInteger(x) ? x : x.toFixed(2)}`;
   const syncUnit = (u: Unit | null): void => {
@@ -209,6 +211,8 @@ export function mountShell(root: HTMLElement): Shell {
     unitBtn.title = help;
     unitBtn.setAttribute('aria-label', help);
     unitBtn.classList.toggle('border-fg', u !== null);
+    unitName.hidden = u === null;
+    unitName.textContent = u ? `${u.name} ${COPY.perDay}` : '';
   };
   syncUnit(null);
 
