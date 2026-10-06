@@ -14,6 +14,7 @@ import {
   type Settings,
 } from '../model';
 import { getState, setState } from '../store';
+import { CLOCK, WAGE, type Unit } from '../units';
 
 export interface Shell {
   lede: HTMLElement;
@@ -25,7 +26,9 @@ export interface Shell {
   search: HTMLInputElement;
   axis: HTMLElement;
   list: HTMLOListElement;
+  unitBtn: HTMLButtonElement;
   sync: (s: Settings) => void;
+  syncUnit: (u: Unit | null) => void;
 }
 
 const GEAR =
@@ -102,6 +105,7 @@ export function mountShell(root: HTMLElement): Shell {
         <input id="search" type="search" placeholder="${COPY.searchPlaceholder}"
           class="h-10 min-w-0 flex-1 rounded-lg border border-line bg-surface px-3 text-sm outline-none focus:border-secondary" />
         <button id="sort" class="${BTN} w-10 text-base"></button>
+        <button id="unit" class="${BTN} flex min-w-10 items-center justify-center gap-1.5 px-2.5 text-sm"></button>
         <button id="settings-btn" aria-label="${COPY.settings}" title="${COPY.settings}" aria-expanded="false"
           class="${BTN} flex w-10 items-center justify-center">${GEAR}</button>
       </div>
@@ -193,6 +197,21 @@ export function mountShell(root: HTMLElement): Shell {
     sortBtn.setAttribute('aria-label', label);
   };
 
+  const unitBtn = $<HTMLButtonElement>('unit');
+  const price = (x: number): string =>
+    `$${Number.isInteger(x) ? x : x.toFixed(2)}`;
+  const syncUnit = (u: Unit | null): void => {
+    const icon = (u ? u.icon : CLOCK)('h-[18px] w-[18px]');
+    unitBtn.innerHTML = `<span class="unit-pop flex">${icon}</span>${u ? `<span class="hidden max-w-48 truncate sm:inline">${u.name}</span>` : ''}`;
+    const help = u
+      ? COPY.unitHelp(u.name, price(u.price), WAGE)
+      : COPY.unitHours;
+    unitBtn.title = help;
+    unitBtn.setAttribute('aria-label', help);
+    unitBtn.classList.toggle('border-fg', u !== null);
+  };
+  syncUnit(null);
+
   return {
     lede: $('lede'),
     learnBtn,
@@ -203,6 +222,8 @@ export function mountShell(root: HTMLElement): Shell {
     search: $<HTMLInputElement>('search'),
     axis: $('axis'),
     list: $<HTMLOListElement>('list'),
+    unitBtn,
     sync,
+    syncUnit,
   };
 }

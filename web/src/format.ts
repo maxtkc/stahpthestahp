@@ -10,6 +10,18 @@ export function fmtHours(x: number): string {
   return `${sign}${a < 10 ? one.format(a) : int.format(Math.round(a))}`;
 }
 
+/** Signed count, compact above 10k: +4.2, +860, +18k, +1.3M. */
+export function fmtCount(x: number): string {
+  const a = Math.abs(x);
+  if (a < 10_000) {
+    return fmtHours(x);
+  }
+  const sign = x > 0 ? '+' : '−';
+  return a >= 1e6
+    ? `${sign}${one.format(a / 1e6)}M`
+    : `${sign}${int.format(Math.round(a / 1000))}k`;
+}
+
 /** Compact signed hours for axis ticks: +1.2k, -300. */
 export function fmtTick(x: number): string {
   const sign = x > 0 ? '+' : x < 0 ? '−' : '';

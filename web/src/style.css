@@ -154,9 +154,23 @@ a.link:hover {
   outline-offset: 2px;
 }
 
+/* Unit switcher icon pops in on each change */
+.unit-pop {
+  animation: unit-pop 0.3s ease;
+}
+@keyframes unit-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.5) rotate(-30deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .swap > svg {
     transition: none;
+  }
+  .unit-pop {
+    animation: none;
   }
 }
 

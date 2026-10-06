@@ -1,9 +1,10 @@
 import { COPY } from '../content/copy';
 import type { Station } from '../data';
-import { escapeHtml, fmtHours, fmtTick } from '../format';
+import { escapeHtml, fmtCount, fmtHours, fmtTick } from '../format';
 import { costPerRiderS, type Cost, type Scored } from '../model';
 import { bullets, routeColor } from '../routes';
 import type { NetScale } from '../scale';
+import { unitFactor, type Unit } from '../units';
 
 // Train width in px; the track is inset by half of it on each side
 const TRAIN_W = 64;
@@ -38,12 +39,12 @@ function trainImage(color: string, lrv: boolean): string {
   return url;
 }
 
-function tickMarks(scale: NetScale, label: boolean): string {
+function tickMarks(scale: NetScale, label: boolean, factor = 1): string {
   return scale.ticks
     .map((t) => {
       const left = `${(scale(t) * 100).toFixed(3)}%`;
       return label
-        ? `<span class="absolute bottom-0 -translate-x-1/2 ${t === 0 || t === scale.ticks[0] || t === scale.ticks.at(-1) ? '' : 'hidden sm:inline'}" style="left:${left}">${fmtTick(t)}</span>`
+        ? `<span class="absolute bottom-0 -translate-x-1/2 ${t === 0 || t === scale.ticks[0] || t === scale.ticks.at(-1) ? '' : 'hidden sm:inline'}" style="left:${left}">${fmtTick(t * factor)}</span>`
         : `<span class="absolute w-px ${t === 0 ? 'bg-axis' : 'bg-line'}" style="left:${left};top:2px;bottom:2px"></span>`;
     })
     .join('');
@@ -61,6 +62,7 @@ export interface ListView {
     sortDesc: boolean,
     open: string | null,
     cost: Cost,
+    unit: Unit | null,
   ): void;
   /** Element to fill with the open station's details, or null when none is open. */
   detail(): HTMLElement | null;
@@ -121,9 +123,10 @@ export function createList(
   }
 
   let lastScale: NetScale | null = null;
+  let lastUnit: Unit | null = null;
 
   return {
-    render(scored, scale, query, sortDesc, open, cost) {
+    render(scored, scale, query, sortDesc, open, cost, unit) {
       const q = query.trim().toLowerCase();
       const ordered = sortDesc ? scored : [...scored].reverse();
       const visible = ordered.filter(
@@ -131,10 +134,17 @@ export function createList(
       );
       const shown = new Set(visible.map((r) => r.station.key));
 
-      if (scale !== lastScale) {
+      const factor = unitFactor(unit);
+      if (scale !== lastScale || unit !== lastUnit) {
+        const label = unit
+          ? `<span title="${unit.name} ${COPY.perDay}">${unit.icon('inline-block h-3 w-3 align-[-2px]')} ${COPY.perDay}</span>`
+          : COPY.axisLabel;
         axis.innerHTML = `<div class="${GRID.replace('grid-rows-[22px_34px]', '')} text-[10px] tabular-nums text-muted">
-          <span class="relative col-span-3 h-3 sm:col-span-1 sm:col-start-3"><span class="absolute inset-y-0" style="left:${INSET}px;right:${INSET}px">${tickMarks(scale, true)}</span></span>
-          <span class="hidden text-right sm:block">${COPY.axisLabel}</span></div>`;
+          <span class="relative col-span-3 h-3 sm:col-span-1 sm:col-start-3"><span class="absolute inset-y-0" style="left:${INSET}px;right:${INSET}px">${tickMarks(scale, true, factor)}</span></span>
+          <span class="hidden text-right sm:block">${label}</span></div>`;
+        lastUnit = unit;
+      }
+      if (scale !== lastScale) {
         for (const r of scored) {
           const ticks = row(r.station).querySelector(
             '[data-ticks]',
@@ -172,7 +182,10 @@ export function createList(
           r.rank,
         );
         const net = li.querySelector('[data-net]') as HTMLElement;
-        net.textContent = `${fmtHours(r.net)} ${COPY.hrs}`;
+        net.innerHTML = unit
+          ? `${fmtCount(r.net * factor)} ${unit.icon('inline-block h-3.5 w-3.5 align-[-3px]')}`
+          : `${fmtHours(r.net)} ${COPY.hrs}`;
+        net.title = unit ? unit.name : '';
         net.style.color = r.net > 0 ? 'var(--cut)' : '';
         (li.querySelector('[data-cost]') as HTMLElement).textContent =
           cost.source === 'flat'

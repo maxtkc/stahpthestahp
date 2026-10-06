@@ -11,6 +11,7 @@ import { renderLearn } from './ui/learn';
 import { createList } from './ui/list';
 import { mountShell } from './ui/shell';
 import { initTheme } from './theme';
+import { nextUnit, type Unit } from './units';
 
 const shell = mountShell(document.getElementById('app') as HTMLElement);
 initTheme();
@@ -33,6 +34,14 @@ function scaleFor(mode: Settings['mode']): NetScale {
   }
   return s;
 }
+
+// Display unit for the list; deliberately not saved
+let unit: Unit | null = null;
+shell.unitBtn.addEventListener('click', () => {
+  unit = nextUnit(unit, performance.now());
+  shell.syncUnit(unit);
+  render(getState());
+});
 
 let renderedOpen: string | null = null;
 let renderedKey = '';
@@ -67,7 +76,7 @@ function render(s: Settings): void {
   wasLearn = false;
 
   const open = s.open && BY_KEY.has(s.open) ? s.open : null;
-  list.render(scored, scale, shell.search.value, s.sortDesc, open, cost);
+  list.render(scored, scale, shell.search.value, s.sortDesc, open, cost, unit);
   const el = list.detail();
   // Rebuild the detail only when the stop or a setting changes
   const key = JSON.stringify([open, cost, s.mode, el ? el.clientWidth : 0]);

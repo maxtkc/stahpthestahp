@@ -38,6 +38,24 @@ export const SOURCE_HELP = {
   flat: 'One stop cost for every stop, like stopthestop. MBTA’s own "30 to 60 seconds faster" for two fewer C-branch stops implies 15 to 30 s per stop.',
 } as const;
 
+export const UNIT_NAMES = {
+  lobster: 'lobsters',
+  roastBeef: 'roast beef sandwiches',
+  chowder: 'bowls of clam chowder',
+  barPizza: 'bar pizzas',
+  creamPie: 'Boston cream pies',
+  donut: 'Dunkin’ donuts',
+  coffee: 'Dunkin’ coffees',
+  socks: 'pairs of red socks',
+  ticket: 'student 9s tickets',
+  charlie: 'CharlieCard taps',
+  syrup: 'gallons of maple syrup',
+  molasses: 'gallons of molasses',
+  iceCream: 'cups of ice cream',
+  brick: 'Fenway Park bricks',
+  dirt: 'shovelfuls of Fenway Park dirt',
+};
+
 export const COPY = {
   title: 'Stahp the stahp',
   lede: 'Have you ever wondered why the B line is so slow? Well, after a bit of poking around, apparently stopping is slow! It would go SO much faster if it didn’t stop. However, that’s only good for Boston College students speed running it to the Patagonia store downtown. What if we just remove one stop? It turns out that there are many candidates for stops, mostly on the B line, that if removed could save riders time overall. For instance, closing <b class="text-fg">Boston University East</b> at <b class="text-fg">+99 rider-hours</b> every weekday, even counting a minute of walking as 2 on the train.',
@@ -51,6 +69,11 @@ export const COPY = {
   theme: 'Toggle light and dark',
   axisLabel: 'saved / day',
   hrs: 'hrs',
+  perDay: '/ day',
+  unitHours:
+    'Showing rider-hours. Click to count them in Boston things instead',
+  unitHelp: (name: string, price: string, wage: number): string =>
+    `Showing ${name} at ${price} each, valuing an hour at a $${wage} Boston median wage. Click again for another, or pause and click to go back to hours`,
 
   settingsCost: 'Time each stop costs a passing rider',
   settingsFlat: 'Flat stop cost',
