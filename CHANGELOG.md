@@ -1,3 +1,9 @@
+## v0.2.0 (2026-10-06)
+
+### Feat
+
+- **web**: 3d die icon on the unit picker
+
 ## v0.1.0 (2026-10-06)
 
 ### Feat
