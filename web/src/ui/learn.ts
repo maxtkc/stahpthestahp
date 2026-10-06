@@ -4,7 +4,6 @@ import {
   dwellHistogram,
   dwellScatter,
   mbtaCompare,
-  networkGrid,
   strips,
   swarm,
   usage,
@@ -40,7 +39,6 @@ export function renderLearn(
   const ex = el.querySelector('[data-ex]') as HTMLElement;
   swarm(ex, ctx, scale, onOpen);
   strips(ex, ctx, onOpen);
-  networkGrid(ex, ctx);
   usage(ex, ctx, onOpen);
   dwellScatter(ex, ctx);
   dwellHistogram(ex, ctx);

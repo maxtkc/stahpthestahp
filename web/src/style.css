@@ -13,6 +13,7 @@
   --color-cut: var(--cut);
   --color-keep: var(--keep);
   --color-track: var(--track);
+  --color-band: var(--band);
 }
 
 :root {
@@ -25,6 +26,7 @@
   --axis: #c9c8c3;
   --cut: #e34948;
   --keep: #2a78d6;
+  --band: #c3d9f3;
   --track: #b9b8b3;
   --row: 34px;
   color-scheme: light;
@@ -41,6 +43,7 @@
     --axis: #4a4944;
     --cut: #f0605e;
     --keep: #4f94e8;
+    --band: #2f5583;
     --track: #5a5954;
     color-scheme: dark;
   }
@@ -56,6 +59,7 @@
   --axis: #4a4944;
   --cut: #f0605e;
   --keep: #4f94e8;
+  --band: #2f5583;
   --track: #5a5954;
   color-scheme: dark;
 }
@@ -71,6 +75,16 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--foreground);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 4px;
 }
 
 a.link {

@@ -40,6 +40,7 @@ export const SOURCE_HELP = {
 
 export const COPY = {
   title: 'Stahp the stahp',
+  lede: 'Have you ever wondered why the B line is so slow? Well, after a bit of poking around, apparently stopping is slow! It would go SO much faster if it didn’t stop. However, that’s only good for Boston College students speed running it to the Patagonia store downtown. What if we just remove one stop? It turns out that there are many candidates for stops, mostly on the B line, that if removed could save riders time overall. For instance, closing <b class="text-fg">Boston University East</b> at <b class="text-fg">+99 rider-hours</b> every weekday, even counting a minute of walking as 2 on the train.',
   learnMore: 'How this works',
   inspired: 'Inspired by stopthestop.com',
   hideLearnMore: 'Back to the list',
@@ -55,7 +56,7 @@ export const COPY = {
   settingsWeight: 'Walking penalty (vs. riding)',
   settingsSpeed: 'Walking speed',
   dwellNote:
-    'How long does a stop take? The MBTA measures dwell in LAMP as the time between a train’s first "stopped" and first "moving" GPS ping at a platform. Our measured stop costs average about 61 s on the Green Line, 1.6 to 4 times what MBTA’s own C-branch estimate implies, so we let you pick.',
+    'How long does a stop take? The MBTA measures dwell in LAMP as the time between a train’s first "stopped" and first "moving" GPS ping at a platform. Measured stop costs average about 61 s on the Green Line, 1.6 to 4 times what MBTA’s own C-branch estimate implies, so the choice is yours.',
   dwellLinks: [
     ['LAMP dwell and travel time definitions', 'lampDwell'],
     ['LAMP data dictionary', 'lampDictionary'],
@@ -105,22 +106,19 @@ export const COPY = {
 
   network: {
     intro:
-      'Every number on this page comes from public MBTA data and a few lines of arithmetic. For each stop we add up the seconds it costs everyone riding through it and subtract the extra walking for everyone who uses it.',
+      'Every number on this page comes from public MBTA data and a few lines of arithmetic. Each stop’s score adds up the seconds it costs everyone riding through it and subtracts the extra walking for everyone who uses it.',
     how: 'How the score works',
     howBody: [
-      'Through riders × stop cost = hours saved on trains if the stop goes. A stop cost is the time a passing rider spends on it: dwell at the platform plus the time lost braking in and pulling away.',
-      'Riders who get on or off × their extra walk ÷ walking speed × walking penalty = hours lost walking. Walking counts double by default because waiting and walking feel slower than riding.',
-      'Net = saved − walked. Positive means riders as a whole would be better off without the stop. Terminals are left out; transfer stops and junctions are scored but flagged.',
+      '<code>Through riders × stop cost = hours saved on trains</code> if the stop goes. A stop cost is the time a passing rider spends on it: dwell at the platform plus the time lost braking in and pulling away.',
+      '<code>Riders who get on or off × their extra walk ÷ walking speed × walking penalty = hours lost walking</code>. Walking counts double by default because waiting and walking feel slower than riding.',
+      '<code>Net = saved − walked</code>. Positive means riders as a whole would be better off without the stop. Terminals are left out; transfer stops and junctions are scored but flagged.',
     ],
     swarm: 'Every stop, by net hours per weekday',
     swarmBody:
       'Each dot is a stop, sized by riders passing through. Right of zero, closing it helps; left of zero, it hurts, and that side is compressed so the busiest stops fit.',
     strips: 'Along each line',
     stripsBody:
-      'Stops placed by distance along the track and coloured by net hours. Stops packed close together on the surface branches tend to come out red.',
-    grid: 'How many stops would be worth closing?',
-    gridBody:
-      'Stops with positive net hours, and their total, as stop cost and walking penalty change. The first column is the measured stop cost.',
+      'Stops placed by distance along the track and coloured by net hours. Stops packed close together on the surface branches tend to come out red. Each stop is scored as if it were the only one removed: closing one makes its neighbours busier and farther apart, so they may no longer make sense to remove.',
     scatter: 'Dwell vs. riders per train',
     scatterBody:
       'Each dot is a platform in one direction. Even where about one person gets on or off per train, trains still sit for 30 s or more. Some of that is real (doors, fare payment, operator checks), some is how LAMP times a stop.',
@@ -136,7 +134,7 @@ export const COPY = {
       'Daily riders getting on or off against riders passing through. Stops in the lower right are the ones a lot of people ride past and few use.',
     usageX: 'riders passing through per weekday',
     usageY: 'riders getting on or off per weekday',
-    mbta: 'Our numbers vs. the MBTA’s C-branch estimate',
+    mbta: 'This model vs. the MBTA’s C-branch estimate',
     mbtaBody:
       'The MBTA is closing Kent Street and merging Brandon Hall and Fairbanks Street. It says trips will be "30 to 60 seconds faster" for the two stops removed, about 15 to 30 s each. Here is what each stop costs a passing rider under the current setting, per direction.',
     mbtaBand: 'MBTA implied, per stop',

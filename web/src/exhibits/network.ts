@@ -2,20 +2,13 @@ import { max } from 'd3-array';
 import { forceCollide, forceSimulation, forceX, forceY } from 'd3-force';
 import { scaleLog } from 'd3-scale';
 import { COPY } from '../content/copy';
-import {
-  MODES,
-  NAMES,
-  dailyRiders,
-  type ModeName,
-  type Station,
-} from '../data';
+import { MODES, NAMES, dailyRiders, type ModeName } from '../data';
 import { escapeHtml, fmtHours, fmtInt, fmtTick } from '../format';
-import { MBTA_IMPLIED_S, type Cost } from '../model';
+import { MBTA_IMPLIED_S } from '../model';
 import { lineName, routeColor } from '../routes';
 import type { NetScale } from '../scale';
 import { hideTip, showTip } from '../ui/tip';
 import { figure, legend, netColor, widthOf, type Ctx } from './common';
-import { heatmapHtml } from './station';
 
 const modesIn = (ctx: Ctx): ModeName[] =>
   ctx.settings.mode === 'all' ? ['green', 'subway'] : [ctx.settings.mode];
@@ -162,31 +155,6 @@ export function strips(
   );
 }
 
-/** Stops worth closing and their total, across stop cost and walk weight. */
-export function networkGrid(parent: HTMLElement, ctx: Ctx): void {
-  const el = figure(parent, COPY.network.grid, COPY.network.gridBody);
-  const stations = ctx.scored.map((r) => r.station);
-  const net = (s: Station, c: Cost): number => {
-    const saved =
-      c.source === 'flat'
-        ? (s.through * c.flatS) / 3600
-        : s.dwell_h + s.accel_h;
-    return saved - (s.walk_mh / c.walkSpeed) * c.walkWeight;
-  };
-  el.innerHTML = heatmapHtml(
-    (c) => {
-      const pos = stations.map((s) => net(s, c)).filter((v) => v > 0);
-      const total = pos.reduce((a, b) => a + b, 0);
-      return {
-        value: pos.length,
-        text: `${pos.length}<span class="hidden text-[9px] opacity-70 sm:block">${fmtTick(total)} h</span>`,
-      };
-    },
-    ctx.cost.walkSpeed,
-    ctx.cost.walkWeight,
-  );
-}
-
 /** Median dwell vs riders getting on or off per train, per platform and direction. */
 export function dwellScatter(parent: HTMLElement, ctx: Ctx): void {
   const pts = modesIn(ctx).flatMap((m) =>
@@ -319,7 +287,7 @@ export function usage(
   const el = figure(parent, COPY.network.usage, COPY.network.usageBody);
   const W = widthOf(el);
   const H = 240;
-  const pad = { l: 40, r: 8, t: 8, b: 30 };
+  const pad = { l: 52, r: 8, t: 8, b: 30 };
   const pts = ctx.scored.map((r) => ({ r, ...dailyRiders(r.station) }));
   const xMax = max(pts, (p) => p.through) ?? 10;
   const yMax = max(pts, (p) => p.used) ?? 10;
@@ -354,15 +322,16 @@ export function usage(
         )
         .join('')}
       <text class="tick-label" x="${(W + pad.l) / 2}" y="${H - 2}" text-anchor="middle">${COPY.network.usageX}</text>
+      <text class="tick-label" transform="translate(10 ${(H - pad.b + pad.t) / 2}) rotate(-90)" text-anchor="middle">${COPY.network.usageY}</text>
       ${pts.map((p) => `<circle data-k="${p.r.station.key}" cx="${xs(Math.max(p.through, 100))}" cy="${ys(Math.max(p.used, 30))}" r="4" fill="${p.r.net > 0 ? 'var(--cut)' : 'var(--keep)'}" fill-opacity="0.7" class="cursor-pointer"/>`).join('')}
-      ${pts
-        .filter((p) => top.has(p.r.station.key))
-        .map(
-          (p) =>
-            `<text class="tick-label" x="${xs(Math.max(p.through, 100)) + 6}" y="${ys(Math.max(p.used, 30)) + 3}" style="fill:var(--foreground)">${escapeHtml(p.r.station.name)}</text>`,
-        )
-        .join('')}
-    </svg><p class="text-[10px] text-muted">${COPY.network.usageY} (vertical axis)</p>`;
+      ${usageLabels(
+        pts.filter((p) => top.has(p.r.station.key)),
+        (p) => xs(Math.max(p.through, 100)),
+        (p) => ys(Math.max(p.used, 30)),
+        W - pad.r,
+        [pad.t + 8, H - pad.b - 2],
+      )}
+    </svg>`;
   const byKey = new Map(pts.map((p) => [p.r.station.key, p]));
   hover(
     el,
@@ -376,9 +345,55 @@ export function usage(
   );
 }
 
-const MBTA_STOPS = ['place-kntst', 'place-bndhl', 'place-fbkst'];
+/** Point labels pushed down past each other, with a leader line when moved. */
+function usageLabels<P extends { r: { station: { name: string } } }>(
+  pts: P[],
+  cx: (p: P) => number,
+  cy: (p: P) => number,
+  right: number,
+  [yMin, yMax]: [number, number],
+): string {
+  const lineH = 11;
+  const labels = pts
+    .map((p) => {
+      const name = p.r.station.name;
+      const w = name.length * 6;
+      const x = cx(p);
+      const flip = x + 6 + w > right;
+      return {
+        name,
+        cx: x,
+        cy: cy(p),
+        x0: flip ? x - 6 - w : x + 6,
+        x1: flip ? x - 6 : x + 6 + w,
+        flip,
+        y: cy(p) + 3,
+      };
+    })
+    .sort((a, b) => a.y - b.y);
+  labels.forEach((l, i) => {
+    for (const prev of labels.slice(0, i)) {
+      if (l.y - prev.y < lineH && l.x0 < prev.x1 && prev.x0 < l.x1) {
+        l.y = prev.y + lineH;
+      }
+    }
+    l.y = Math.min(Math.max(l.y, yMin), yMax);
+  });
+  return labels
+    .map((l) => {
+      const tx = l.flip ? l.cx - 6 : l.cx + 6;
+      const leader =
+        Math.abs(l.y - 3 - l.cy) > 2
+          ? `<line x1="${l.cx}" y1="${l.cy}" x2="${tx}" y2="${l.y - 3}" stroke="var(--axis)"/>`
+          : '';
+      return `${leader}<text class="tick-label" x="${tx}" y="${l.y}" text-anchor="${l.flip ? 'end' : 'start'}" style="fill:var(--foreground)">${escapeHtml(l.name)}</text>`;
+    })
+    .join('');
+}
 
-/** Kent Street, Brandon Hall and Fairbanks: our per-rider stop cost vs MBTA's figure. */
+const MBTA_STOPS =['place-kntst', 'place-bndhl', 'place-fbkst'];
+
+/** Kent Street, Brandon Hall and Fairbanks: measured per-rider stop cost vs MBTA's figure. */
 export function mbtaCompare(parent: HTMLElement, ctx: Ctx): void {
   if (!modesIn(ctx).includes('green')) {
     return;
@@ -420,17 +435,14 @@ export function mbtaCompare(parent: HTMLElement, ctx: Ctx): void {
     `<div class="grid grid-cols-[10rem_1fr_3rem] items-center gap-3 text-xs">
       <span class="${bold ? 'font-semibold' : 'text-secondary'}">${escapeHtml(label)}</span>
       <div class="relative h-5">
-        <div class="absolute inset-y-0 rounded-sm bg-keep/25" style="left:${pct(band[0])}%;width:${pct(band[1] - band[0])}%"></div>
+        <div class="absolute inset-y-0 rounded-sm bg-band" style="left:${pct(band[0])}%;width:${pct(band[1] - band[0])}%"></div>
         <div class="absolute inset-y-1.5 left-0 rounded-sm bg-fg" style="width:${pct(v)}%"></div>
       </div>
       <span class="text-right tabular-nums">${Math.round(v)} s</span></div>`;
   el.innerHTML =
     legend([
-      ['var(--foreground)', 'our stop cost per passing rider'],
-      [
-        'color-mix(in srgb, var(--keep) 25%, transparent)',
-        COPY.network.mbtaBand,
-      ],
+      ['var(--foreground)', 'measured stop cost per passing rider'],
+      ['var(--band)', COPY.network.mbtaBand],
     ]) +
     `<div class="space-y-2">${rows.map((r) => bar(r.label, r.v, MBTA_IMPLIED_S)).join('')}
       ${bar('Kent + one of the pair', combined, [2 * MBTA_IMPLIED_S[0], 2 * MBTA_IMPLIED_S[1]], true)}

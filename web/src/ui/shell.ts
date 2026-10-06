@@ -74,7 +74,7 @@ export function mountShell(root: HTMLElement): Shell {
   <main class="mx-auto max-w-4xl px-4 pb-24 pt-10 sm:px-6 sm:pt-16">
     <header class="max-w-2xl">
       <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">${COPY.title}</h1>
-      <p id="lede" class="mt-4 text-[15px] leading-7 text-secondary"></p>
+      <p id="lede" class="mt-4 text-[15px] leading-7 text-secondary">${COPY.lede}</p>
       <div class="mt-5 flex flex-wrap items-center gap-2">
         <button id="learn-btn" class="${BTN} px-4 text-sm"></button>
         <a class="link px-1 text-sm" href="${LINKS.stopthestop}" target="_blank" rel="noopener noreferrer">${COPY.inspired}</a>
