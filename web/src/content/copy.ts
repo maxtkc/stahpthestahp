@@ -1,6 +1,7 @@
 /** Page copy and external links. No m-dashes. */
 
 export const LINKS = {
+  repo: 'https://github.com/maxtkc/stahpthestahp',
   lampDwell:
     'https://github.com/mbta/lamp/blob/main/src/lamp_py/performance_manager/README.md',
   lampDictionary: 'https://github.com/mbta/lamp/blob/main/Data_Dictionary.md',
@@ -67,6 +68,7 @@ export const COPY = {
   sortWorst: 'Most time lost first',
   settings: 'Settings',
   theme: 'Toggle light and dark',
+  repo: 'Source on GitHub',
   axisLabel: 'saved / day',
   hrs: 'hrs',
   perDay: '/ day',

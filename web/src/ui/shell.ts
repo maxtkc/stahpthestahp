@@ -39,6 +39,9 @@ const SUN =
 const MOON =
   '<svg viewBox="0 0 24 24" class="swap-off h-[18px] w-[18px] fill-current" aria-hidden="true"><path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z"/></svg>';
 
+const GITHUB =
+  '<svg viewBox="0 0 24 24" class="h-[18px] w-[18px] fill-current" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-1.97c-3.2.7-3.87-1.54-3.87-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.69 1.25 3.35.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg>';
+
 const BTN =
   'h-10 shrink-0 rounded-lg border border-line bg-surface hover:border-secondary';
 const PILL = 'h-8 rounded-full border px-3 text-xs';
@@ -80,14 +83,17 @@ export function mountShell(root: HTMLElement): Shell {
 
   root.innerHTML = `
   <main class="mx-auto max-w-4xl px-4 pb-24 pt-10 sm:px-6 sm:pt-16">
-    <header class="max-w-2xl">
+    <header>
       <div class="flex items-start justify-between gap-4">
         <h1 class="text-3xl font-semibold tracking-tight sm:text-4xl">${COPY.title}</h1>
-        <label class="theme-toggle swap ${BTN} flex w-10 cursor-pointer items-center justify-center" title="${COPY.theme}">
-          <input type="checkbox" class="theme-controller" value="light" />
-          <span class="sr-only">${COPY.theme}</span>
-          ${SUN}${MOON}
-        </label>
+        <div class="flex gap-2">
+          <a class="${BTN} flex w-10 items-center justify-center" href="${LINKS.repo}" target="_blank" rel="noopener noreferrer" title="${COPY.repo}" aria-label="${COPY.repo}">${GITHUB}</a>
+          <label class="theme-toggle swap ${BTN} flex w-10 cursor-pointer items-center justify-center" title="${COPY.theme}">
+            <input type="checkbox" class="theme-controller" value="light" />
+            <span class="sr-only">${COPY.theme}</span>
+            ${SUN}${MOON}
+          </label>
+        </div>
       </div>
       <p id="lede" class="mt-4 text-[15px] leading-7 text-secondary">${COPY.lede}</p>
       <div class="mt-5 flex flex-wrap items-center gap-2">

@@ -9,6 +9,8 @@ import { unitFactor, type Unit } from '../units';
 // Train width in px; the track is inset by half of it on each side
 const TRAIN_W = 64;
 const INSET = TRAIN_W / 2;
+// Trains start this fraction of the track left of zero and slide in on first render
+const START_POS = -0.3;
 const GRID =
   'grid grid-cols-[1.5rem_minmax(0,1fr)_auto] grid-rows-[22px_34px] items-center gap-x-2 sm:grid-cols-[1.75rem_13rem_1fr_5.25rem] sm:grid-rows-1';
 
@@ -107,7 +109,7 @@ export function createList(
         <span class="absolute inset-x-0 z-10 h-0.5 rounded-full bg-track" style="bottom:5px"></span>
         <span data-ticks class="absolute inset-y-0" style="left:${INSET}px;right:${INSET}px"></span>
         <span class="absolute inset-y-0 [container-type:inline-size]" style="left:${INSET}px;right:${INSET}px">
-          <span class="train absolute left-0" style="bottom:6px;height:${(TRAIN_W * 20) / 120}px;width:${TRAIN_W}px;margin-left:-${INSET}px;background-image:${trainImage(routeColor(s.routes[0]), s.mode === 'green')};background-size:100% 100%"></span>
+          <span class="train absolute left-0" style="--pos:${START_POS};bottom:6px;height:${(TRAIN_W * 20) / 120}px;width:${TRAIN_W}px;margin-left:-${INSET}px;background-image:${trainImage(routeColor(s.routes[0]), s.mode === 'green')};background-size:100% 100%"></span>
         </span>
       </span>`;
     li.addEventListener('click', () => onToggle(s.key));
@@ -124,6 +126,10 @@ export function createList(
 
   let lastScale: NetScale | null = null;
   let lastUnit: Unit | null = null;
+  // Stations in the previous render; any others slide in from START_POS
+  let lastKeys = new Set<string>();
+  // Entering trains and their target pos and row index, held until START_POS has painted
+  const waiting = new Map<HTMLElement, [string, number]>();
 
   return {
     render(scored, scale, query, sortDesc, open, cost, unit) {
@@ -176,6 +182,7 @@ export function createList(
         list.style.height = `calc(${visible.length} * var(--row) + ${openIdx >= 0 ? detailH : 0}px)`;
       };
 
+      const scheduled = waiting.size > 0;
       visible.forEach((r, i) => {
         const li = row(r.station);
         (li.querySelector('[data-rank]') as HTMLElement).textContent = String(
@@ -192,12 +199,34 @@ export function createList(
             ? ''
             : `${Math.round(costPerRiderS(r.station, cost))} s`;
         const train = li.querySelector('.train') as HTMLElement;
-        train.style.setProperty('--pos', scale(r.net).toFixed(5));
-        train.style.transitionDelay = `${Math.min(i * 12, 500)}ms`;
+        const pos = scale(r.net).toFixed(5);
+        if (!lastKeys.has(r.station.key)) {
+          train.style.setProperty('--pos', String(START_POS));
+          waiting.set(train, [pos, i]);
+        } else if (waiting.has(train)) {
+          waiting.set(train, [pos, i]);
+        } else {
+          train.style.setProperty('--pos', pos);
+          train.style.transitionDelay = `${Math.min(i * 12, 500)}ms`;
+        }
         li.setAttribute('aria-expanded', String(r.station.key === open));
         li.classList.toggle('bg-surface', r.station.key === open);
       });
       layout();
+
+      // Wait two frames so entering trains paint at START_POS, then slide them in
+      if (waiting.size > 0 && !scheduled) {
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            for (const [train, [pos, i]] of waiting) {
+              train.style.setProperty('--pos', pos);
+              train.style.transitionDelay = `${40 * Math.min(i, 20)}ms`;
+            }
+            waiting.clear();
+          }),
+        );
+      }
+      lastKeys = new Set(scored.map((r) => r.station.key));
     },
     detail: () => (detail.hidden ? null : detail),
   };
